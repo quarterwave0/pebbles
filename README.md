@@ -1,1 +1,1 @@
-A basic numerical calculus toolbox I am making to gain familiarity with Rust. It supports trapezoidal numerical integration, as well as finite difference numerical differentiation, both in one and two dimensions.
+A basic numerical calculus toolbox I am making to gain familiarity with Rust. It supports trapezoidal numerical integration, as well as finite difference numerical differentiation, both in one and two dimensions. It also has support for Euler and RK5 ODE solving on first-order ODEs.
