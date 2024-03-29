@@ -1,9 +1,8 @@
 pub fn df1(eval_function: &dyn Fn(f32) -> f32, x: f32, h: f32, mode: i8) -> f32 {
-    match mode{
-        0=> return (eval_function(x+h) - eval_function(x))/h, //forward
-        1=> return (eval_function(x) - eval_function(x-h))/h, //backward
-        2=> return (eval_function(x+(h/2.0)) - eval_function(x-(h/2.0)))/h, //central
-        _=> return (eval_function(x+(h/2.0)) - eval_function(x-(h/2.0)))/h //central again
+    return match mode {
+        0 => (eval_function(x + h) - eval_function(x)) / h, //forward
+        1 => (eval_function(x) - eval_function(x - h)) / h, //backward
+        2 | _ => (eval_function(x + (h / 2.0)) - eval_function(x - (h / 2.0))) / h, //central
     }
 }
 
