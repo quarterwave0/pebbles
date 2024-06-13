@@ -19,7 +19,8 @@ fn main() {
     let euler_system_ode: Vec<Vec<f32>> = ode::euler_system(vec![&dho_ode_a, &dho_ode_b], vec![0.0, 1.0], 0.001, 0.0, 2.0);
     let rk5_system_ode: Vec<Vec<f32>> = ode::rk5_system(vec![&dho_ode_a, &dho_ode_b], vec![0.0, 1.0], 0.001, 0.0, 2.0);
 
-    let solution_pde: Vec<Vec<f32>> = pde::ctcs2_1d(&wave_pde, &pde_icond, vec![10.0], 1.5, 0.001, 1.0, 0.0, 0.01);
+    let solution_pde: Vec<Vec<f32>> = pde::ctcs22_1d(&wave_pde, &pde_icond, vec![10.0], 1.5, 0.001, 1.0, 0.0, 0.01);
+    let solution_pde_2d: Vec<Vec<Vec<f32>>> = pde::ctcs22_2d(&wave_pde_2d, &pde_icond_2d, vec![0.5], 2.00, 0.01, 1.0, 0.0, 0.01);
 
     println!("Integral 1D: {0}", integral_solution_1d);
     println!("Integral 2D: {0}", integral_solution_2d);
@@ -32,17 +33,9 @@ fn main() {
     println!("ODE Euler System: y={0}, dy/dt={1}", euler_system_ode[1000][0], euler_system_ode[1000][1]);
     println!("ODE RK5 System: y={0}, dy/dt={1}", rk5_system_ode[1000][0], rk5_system_ode[1000][1]);
 
-    let mut file = File::create("pde_output.txt").unwrap();
+    write_pde_1d_output(solution_pde);
+    write_pde_2d_output(solution_pde_2d);
 
-    for a in solution_pde {
-        for b in 0..a.len() {
-            write!(file, "{:?}", a[b]).unwrap();
-            if b != a.len()-1 {
-                write!(file, ":").unwrap();
-            }
-        }
-        writeln!(file).unwrap();
-    }
 }
 
 fn fint(x: f32) -> f32 {
@@ -89,4 +82,47 @@ fn pde_icond(x: f32) -> f32 {
         return E.powf(-1.0 / (1.0 - (4.0*x-2.0).powi(2))) //bump function
     }
     return 0.0
+}
+
+fn wave_pde_2d(d: Vec<f32>, constants: &Vec<f32>) -> f32 {
+    return constants[0].powi(2)  * (d[0] + d[1]); // d^2u/dt^2 = c^2 * (d^2u/dx^2 + d^2u/dy^2)
+}
+fn pde_icond_2d(x: f32, y:f32) -> f32 {
+
+    if ((x>=0.25) & (x<=0.75)) & ((y>=0.25) & (y<=0.75)) {
+        return (E.powf(-1.0 / (1.0 - (4.0*x-2.0).powi(2)))) * (E.powf(-1.0 / (1.0 - (4.0*y-2.0).powi(2)))) //bump function
+    }
+    return 0.0
+
+    //return (1.0 / (1.0 + E.powf(-20.0 * (x - 0.5))))*(1.0 / (1.0 + E.powf(-20.0 * (y - 0.5))))
+}
+
+fn write_pde_2d_output(output: Vec<Vec<Vec<f32>>>) {
+
+    let mut file = File::create("pde_output_2d.txt").unwrap();
+
+    for a in output { //timestep
+        for b in 0..a.len() {
+            write!(file, "{:?}", a[b]).unwrap();
+            if b != a.len()-1 {
+                write!(file, ":").unwrap();
+            }
+        }
+        writeln!(file).unwrap();
+    }
+}
+
+fn write_pde_1d_output(output: Vec<Vec<f32>>) {
+
+    let mut file = File::create("pde_output.txt").unwrap();
+
+    for a in output { //timestep
+        for b in 0..a.len() {
+            write!(file, "{:?}", a[b]).unwrap();
+            if b != a.len()-1 {
+                write!(file, ":").unwrap();
+            }
+        }
+        writeln!(file).unwrap();
+    }
 }
